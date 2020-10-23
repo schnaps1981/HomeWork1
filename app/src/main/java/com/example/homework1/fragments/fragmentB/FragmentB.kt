@@ -3,9 +3,11 @@ package com.example.homework1.fragments.fragmentB
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.work.Constraints
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.example.homework1.R
 import com.example.homework1.utils.ContextResReader
@@ -38,17 +40,21 @@ class FragmentB : Fragment(R.layout.fragment_b) {
         }
 
         WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(randomWork.id)
-            .observeForever {
+            .observe(viewLifecycleOwner, Observer {
                 it?.let {
-                    if (it.state.isFinished) {
+                    if (it.state == WorkInfo.State.SUCCEEDED) {
                         val result =
                             it.outputData.getInt(RandomNumberWorker.WORKER_RESULT_RANDOM_NUMBER, 0)
 
                         tvNumberValue.text = resReader.getString(R.string.numberValue, result)
                     }
                 }
-            }
+            })
+    }
 
+    override fun onPause() {
+        workManager.cancelWorkById(randomWork.id)
+        super.onPause()
     }
 
 

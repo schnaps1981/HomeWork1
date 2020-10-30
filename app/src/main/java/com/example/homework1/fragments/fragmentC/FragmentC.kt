@@ -10,21 +10,28 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.homework1.R
+import com.example.homework1.models.PhoneContact
 import kotlinx.android.synthetic.main.fragment_c.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
-
 
 class FragmentC : Fragment(R.layout.fragment_c) {
+
+    private val rvAdapter = ContactListAdapter()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+
+        rvContacts.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = rvAdapter
+        }
 
         if (isReadContactsPermitted())
             getContacts()
@@ -37,6 +44,7 @@ class FragmentC : Fragment(R.layout.fragment_c) {
         gotoFragmentA.setOnClickListener {
             navController.navigate(R.id.fragmentA)
         }
+
     }
 
     private fun isReadContactsPermitted() = ContextCompat.checkSelfPermission(
@@ -61,6 +69,8 @@ class FragmentC : Fragment(R.layout.fragment_c) {
     }
 
     private fun getContacts() {
+        val contactItems = arrayListOf<PhoneContact>()
+
         CoroutineScope(Dispatchers.Main).launch {
             progressBar.isVisible = true
 
@@ -91,6 +101,7 @@ class FragmentC : Fragment(R.layout.fragment_c) {
                                     arrayOf(id),
                                     null
                                 )
+
                                 phoneCursor?.let {
                                     while (phoneCursor.moveToNext()) {
                                         val phoneNo: String = phoneCursor.getString(
@@ -98,11 +109,8 @@ class FragmentC : Fragment(R.layout.fragment_c) {
                                                 ContactsContract.CommonDataKinds.Phone.NUMBER
                                             )
                                         )
+                                        contactItems.add(PhoneContact(name = name, phone = phoneNo))
 
-                                        withContext(Dispatchers.Main) {
-                                            progressBar.isVisible = false
-                                            Timber.d("$name ,-----> $phoneNo")
-                                        }
                                     }
                                 }
                                 phoneCursor?.close()
@@ -113,16 +121,15 @@ class FragmentC : Fragment(R.layout.fragment_c) {
                     mainCursor.close()
                 }
             }
+            progressBar.isVisible = false
+            rvAdapter.setList(contactItems)
         }
     }
 
     companion object {
-
         private const val REQUEST_PERMISSIONS_CODE = 1234
-
 
         @JvmStatic
         fun newInstance() = FragmentC()
     }
-
 }

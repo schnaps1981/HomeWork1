@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/holo_red_light"
     tools:context=".fragments.fragmentA.FragmentA">
 
     <TextView
+        android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="32sp"
         android:layout_gravity="center_horizontal"
-        android:text="Fragment A"/>
+        android:text="Fragment A"
+        android:textSize="32sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <Button
@@ -19,6 +23,59 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"
-        android:text="Goto to Fragment B" />
+        android:text="Goto to Fragment B"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-</FrameLayout>
+    <com.example.homework1.widget.SpeedMeter
+        android:id="@+id/speedMeter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:labelTextSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/gotoFragmentB"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView3"
+        app:layout_constraintVertical_bias="0.16"
+        app:maxSpeed="240" />
+
+    <Button
+        android:id="@+id/btnIncreaseSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="+"
+        app:layout_constraintEnd_toEndOf="@+id/speedMeter"
+        app:layout_constraintTop_toBottomOf="@+id/speedMeter" />
+
+    <Button
+        android:id="@+id/btnSetSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="160dp"
+        android:layout_marginTop="64dp"
+        android:text="SET"
+        app:layout_constraintStart_toStartOf="@+id/speedMeter"
+        app:layout_constraintTop_toBottomOf="@+id/speedMeter" />
+
+    <Button
+        android:id="@+id/btnDecreaseSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="-"
+        app:layout_constraintStart_toStartOf="@+id/speedMeter"
+        app:layout_constraintTop_toBottomOf="@+id/speedMeter" />
+
+    <EditText
+        android:id="@+id/etSetSpeed"
+        android:layout_width="121dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="64dp"
+        android:inputType="numberDecimal"
+        android:text="60"
+        app:layout_constraintStart_toStartOf="@+id/speedMeter"
+        app:layout_constraintTop_toBottomOf="@+id/speedMeter" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/router"
-    app:startDestination="@id/fragmentA">
+    app:startDestination="@id/fragmentC">
     <fragment
         android:id="@+id/fragmentA"
         android:name="com.example.homework1.fragments.fragmentA.FragmentA"

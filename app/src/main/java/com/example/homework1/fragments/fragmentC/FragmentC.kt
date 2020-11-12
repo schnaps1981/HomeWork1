@@ -13,6 +13,8 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.homework1.R
 import com.example.homework1.models.PhoneContact
+import com.example.homework1.room.PhoneContactEntity
+import com.example.homework1.room.PhoneContactsDatabase
 import kotlinx.android.synthetic.main.fragment_c.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,11 +24,16 @@ import kotlinx.coroutines.withContext
 class FragmentC : Fragment(R.layout.fragment_c) {
 
     private val rvAdapter = ContactListAdapter()
+    private lateinit var dbInstance: PhoneContactsDatabase
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
+
+        PhoneContactsDatabase.getInstance(requireContext())?.let {
+            dbInstance = it
+        }
 
         rvContacts.apply {
             layoutManager = LinearLayoutManager(context)
@@ -43,6 +50,10 @@ class FragmentC : Fragment(R.layout.fragment_c) {
 
         gotoFragmentA.setOnClickListener {
             navController.navigate(R.id.fragmentA)
+        }
+
+        btnReadDB.setOnClickListener {
+            showContactsFromDB()
         }
 
     }
@@ -109,6 +120,7 @@ class FragmentC : Fragment(R.layout.fragment_c) {
                                                 ContactsContract.CommonDataKinds.Phone.NUMBER
                                             )
                                         )
+
                                         contactItems.add(PhoneContact(name = name, phone = phoneNo))
 
                                     }
@@ -122,14 +134,41 @@ class FragmentC : Fragment(R.layout.fragment_c) {
                 }
             }
             progressBar.isVisible = false
-            rvAdapter.setList(contactItems)
+
+            saveContactsDB(contactItems)
+        }
+    }
+
+    private fun saveContactsDB(items: List<PhoneContact>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            dbInstance.contactDao().clearTable()
+
+            dbInstance.contactDao()
+                .addAllContacts(items.map { PhoneContactEntity(phoneContact = it) })
+
+            withContext(Dispatchers.Main) {
+                btnReadDB.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun showContactsFromDB() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val list = dbInstance.contactDao().getAllContacts()
+
+            val rvList = list.map {
+                PhoneContact(name = it.phoneContact.name, phone = it.phoneContact.phone)
+            }
+
+            withContext(Dispatchers.Main) {
+                rvAdapter.setList(rvList)
+                Toast.makeText(requireContext(), "Прочитано из БД!", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
     companion object {
         private const val REQUEST_PERMISSIONS_CODE = 1234
 
-        @JvmStatic
-        fun newInstance() = FragmentC()
     }
 }
